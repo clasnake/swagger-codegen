@@ -1,0 +1,13 @@
+package {{packageName}}
+
+import {{modelPackage}}._
+import spray.json.DefaultJsonProtocol
+
+trait Protocols extends DefaultJsonProtocol {
+{{#models}}
+    {{#model}}
+    implicit val {{classname}}Format = jsonFormat({{classname}}, {{#vars}}"{{name}}"{{^-last}}, {{/-last}}{{/vars}})
+    {{/model}}
+{{/models}}
+}
+

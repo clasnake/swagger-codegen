@@ -105,14 +105,14 @@ public class AkkaHttpScalaServerCodegen extends DefaultCodegen implements Codege
         }
 
         supportingFiles.add(new SupportingFile("README.mustache", "", "README.md"));
-//        supportingFiles.add(new SupportingFile("build.sbt", "", "build.sbt"));
+        supportingFiles.add(new SupportingFile("build.sbt", "", "build.sbt"));
 //        supportingFiles.add(new SupportingFile("Server.mustache", sourceFolder, "Server.scala"));
 //        supportingFiles.add(new SupportingFile("DataAccessor.mustache", sourceFolder, "DataAccessor.scala"));
 //
 //        supportingFiles.add(new SupportingFile("project/build.properties", "project", "build.properties"));
 //        supportingFiles.add(new SupportingFile("project/plugins.sbt", "project", "plugins.sbt"));
-//        supportingFiles.add(new SupportingFile("sbt", "", "sbt"));
-//
+        supportingFiles.add(new SupportingFile("sbt", "", "sbt"));
+        supportingFiles.add(new SupportingFile("Protocols.mustache", sourceFolder + "/io/swagger", "Protocols.scala"));
 //        supportingFiles.add(new SupportingFile("endpoint.mustache", sourceFolder, "endpoint.scala"));
 //        supportingFiles.add(new SupportingFile("errors.mustache", sourceFolder, "errors.scala"));
 

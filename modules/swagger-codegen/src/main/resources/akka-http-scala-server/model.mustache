@@ -1,0 +1,17 @@
+package {{modelPackage}}
+
+{{#imports}}import {{import}}
+{{/imports}}
+
+{{#models}}
+    {{#model}}
+/**
+* {{{description}}}
+        {{#vars}}
+* @param {{name}} {{{description}}}
+        {{/vars}}
+*/
+case class {{classname}}({{#vars}}{{name}}: {{^required}}Option[{{{datatype}}}]{{/required}}{{#required}}{{{datatype}}}{{/required}}{{^-last}},{{/-last}}
+        {{/vars}})
+    {{/model}}
+{{/models}}
