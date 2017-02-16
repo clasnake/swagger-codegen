@@ -107,7 +107,7 @@ public class AkkaHttpScalaServerCodegen extends DefaultCodegen implements Codege
         supportingFiles.add(new SupportingFile("README.mustache", "", "README.md"));
         supportingFiles.add(new SupportingFile("build.sbt", "", "build.sbt"));
 //        supportingFiles.add(new SupportingFile("Server.mustache", sourceFolder, "Server.scala"));
-//        supportingFiles.add(new SupportingFile("DataAccessor.mustache", sourceFolder, "DataAccessor.scala"));
+        supportingFiles.add(new SupportingFile("DataAccessor.mustache", sourceFolder + "/io/swagger", "DataAccessor.scala"));
 //
 //        supportingFiles.add(new SupportingFile("project/build.properties", "project", "build.properties"));
 //        supportingFiles.add(new SupportingFile("project/plugins.sbt", "project", "plugins.sbt"));
@@ -234,7 +234,7 @@ public class AkkaHttpScalaServerCodegen extends DefaultCodegen implements Codege
                 }
 
                 if (i != items.length -1) {
-                    scalaPath = scalaPath + " :: ";
+                    scalaPath = scalaPath + " / ";
                 }
             }
 
@@ -242,10 +242,13 @@ public class AkkaHttpScalaServerCodegen extends DefaultCodegen implements Codege
                 // TODO: This hacky, should be converted to mappings if possible to keep it clean.
                 // This could also be done using template imports
                 if(Boolean.TRUE.equals(p.isPrimitiveType)) {
-                    p.vendorExtensions.put("x-codegen-normalized-path-type", p.dataType.toLowerCase());
+                    p.vendorExtensions.put("x-codegen-normalized-path-type", p.dataType);
+                    p.vendorExtensions.put("x-codegen-normalized-input-type", p.dataType);
+                } else if(Boolean.TRUE.equals(p.isPathParam)) {
+                    p.vendorExtensions.put("x-codegen-normalized-path-type", "Segment");
                     p.vendorExtensions.put("x-codegen-normalized-input-type", p.dataType);
                 } else if(Boolean.TRUE.equals(p.isBodyParam)) {
-                    p.vendorExtensions.put("x-codegen-normalized-path-type", "jsonBody["+ p.dataType + "]");
+                    p.vendorExtensions.put("x-codegen-normalized-path-type", "entity(as["+ p.dataType + "])");
                     p.vendorExtensions.put("x-codegen-normalized-input-type", p.dataType);
                 } else if(Boolean.TRUE.equals(p.isContainer) || Boolean.TRUE.equals(p.isListContainer)) {
                     p.vendorExtensions.put("x-codegen-normalized-path-type", "params(\""+ p.paramName + "\")");

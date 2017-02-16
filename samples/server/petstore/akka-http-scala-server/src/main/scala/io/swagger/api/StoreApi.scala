@@ -1,8 +1,103 @@
+package io.swagger.api
+
+import java.io._
+import java.util.Date
+import io.swagger._
 import io.swagger.model._
+import io.swagger.model.Order
+import io.finch.circe._
+import io.circe.generic.semiauto._
+import com.twitter.concurrent.AsyncStream
+import com.twitter.finagle.Service
+import com.twitter.finagle.Http
+import com.twitter.finagle.http.{Request, Response}
+import com.twitter.finagle.http.exp.Multipart.{FileUpload, InMemoryFileUpload, OnDiskFileUpload}
+import com.twitter.util.Future
+import com.twitter.io.Buf
+import io.finch._, items._
+import java.io.File
 
-    trait StoreApi {
+object StoreApi {
+/**
+* Compiles all service endpoints.
+* @return Bundled compilation of all service endpoints.
+*/
+def routes(da: DataAccessor) =
+        deleteOrder(da) ~
+        getInventory(da) ~
+        getOrderById(da) ~
+        placeOrder(da)
+
+        /**
+        * 
+        * @return A route representing a Unit
+        */
+        private def deleteOrder(da: DataAccessor) =
+        path("store" / "order" / string ) = { { (orderId) =>
+        delete {
+            da.Store_deleteOrder(orderId)
+            NoContent[Unit]
+        } handle {
+        case e: Exception => BadRequest(e)
+        }
+        }
+
+        /**
+        * 
+        * @return A route representing a Map[String, Int]
+        */
+        private def getInventory(da: DataAccessor) =
+        path("store" / "inventory" ) = { {  =>
+        get {
+            Ok(da.Store_getInventory())
+        } handle {
+        case e: Exception => BadRequest(e)
+        }
+        }
+
+        /**
+        * 
+        * @return A route representing a Order
+        */
+        private def getOrderById(da: DataAccessor) =
+        path("store" / "order" / long ) = { { (orderId) =>
+        get {
+            Ok(da.Store_getOrderById(orderId))
+        } handle {
+        case e: Exception => BadRequest(e)
+        }
+        }
+
+        /**
+        * 
+        * @return A route representing a Order
+        */
+        private def placeOrder(da: DataAccessor) =
+        path("store" / "order"  / entity(as[Order])) = { { (body) =>
+        post {
+            Ok(da.Store_placeOrder(body))
+        } handle {
+        case e: Exception => BadRequest(e)
+        }
+        }
 
 
+implicit private def fileUploadToFile(fileUpload: FileUpload) : File = {
+fileUpload match {
+case upload: InMemoryFileUpload =>
+bytesToFile(Buf.ByteArray.Owned.extract(upload.content))
+case upload: OnDiskFileUpload =>
+upload.content
+case _ => null
+}
+}
 
+private def bytesToFile(input: Array[Byte]): java.io.File = {
+val file = File.createTempFile("tmpStoreApi", null)
+val output = new FileOutputStream(file)
+output.write(input)
+file
+}
 
-    }
+// This assists in params(string) application (which must be Seq[A] in parameter list) when the param is used as a List[A] elsewhere.
+implicit def seqList[A](input: Seq[A]): List[A] = input.toList
